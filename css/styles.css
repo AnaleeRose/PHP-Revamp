@@ -1,0 +1,181 @@
+/*--------------------------------------------
+Developer: Daphne
+Color Palette:
+#343a40
+
+Fonts:
+'Lato', sans-serif;
+--------------------------------------------*/
+
+
+
+/*Global------------------------------------*/
+.title {
+	font-family: 'Lato', sans-serif;
+	/*color: #fff;*/
+	font-size: 3em;
+}
+
+li {
+  list-style: none;
+}
+
+nav, p, li, h1, h2, .h3 {
+	font-family: 'Lato', sans-serif;
+  color: #fff;
+}
+
+#myBtn {
+  display: none;
+  position: fixed;
+  color: #343a40;
+  bottom: 0;
+  right: 0;
+  z-index: 99;
+  font-size: 1.4em;
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  padding: 20px;
+  border: none;
+  background: #fff;
+  border-radius: 5px;
+  background-size: 20px;
+}
+
+#myBtn:hover, .btn:hover {
+	color: #fff;
+  background: #343a40;
+}
+
+nav, .footer {
+	background-color: #718A94;
+}
+
+/*Header------------------------------------*/
+header img {
+	width: 35%;
+	z-index: 3;
+}
+
+.logo {
+
+}
+
+.nav-link {
+	font-size: 1.4em;
+
+}
+
+
+
+/*Body--------------------------------------*/
+body {
+	background-image: url(../images/northernlights2.jpg);
+  background-repeat: no-repeat;
+	margin: 0 auto;
+	z-index: 1;
+}
+
+/*.origins, .evolve, .smoke_mirrors, .night_visions {
+  background: rgba(41, 43, 44, .8);
+  color: #fff;
+  width: 100%;
+}*/
+
+/*main {
+  padding-top: 15px;
+}*/
+
+/*Albums-----------------------------------*/
+
+ .maincontent {
+ 	background-color: rgba(41, 43, 44, .8);
+ 	border-radius: 10px;
+  color: #fff;
+ 	margin: 0 auto;
+ 	width: 80%;
+ 	padding: 0 20px;
+ }
+
+.maincontent p {
+ 	padding-bottom: 20px;
+ }
+
+ .maincontent ul {
+ 	margin-top: -15px;
+ 	padding-bottom: 20px;
+ }
+
+/* h1, h2 {
+ 	text-align: center;
+ 	font-size: 2.5em;
+ 	padding-top: 20px;
+ }*/
+
+/*.example p {
+	width: 100%;
+	text-align: center;
+	font-size: 1.3em;
+}*/
+
+ .maincontent img {
+	width: 100%;
+}
+
+
+
+/*Footer------------------------------------*/
+footer {
+	margin: 0 auto;
+}
+
+.latest_updates {
+	font-size: 4em;
+	text-align: center;
+	padding-top: 20px;
+}
+
+.form-control {
+	margin: 10px  0 0 0;
+}
+
+#send-btn {
+	text-align: center;
+}
+
+.btn {
+	color: #fff;
+	background-color: #ff621e;
+	margin: 10px 0 20px 0;
+	box-shadow: 0 5px 2px #da5f27;
+}
+
+.btn:hover {
+	box-shadow: 0 3px 1px #da5f27;
+}
+
+.footer {
+	text-align: center;
+	margin-top: 15px;
+  clear: both;
+  overflow: auto;
+}
+
+.footer p {
+	padding: 10px 0;
+}
+
+
+/*@media screen and (max-width: 414px) {
+	.title {
+	font-size: 2em;
+	}
+
+	.footer p {
+	font-size: .85em;
+	}
+}*/
+
+
