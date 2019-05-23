@@ -1,0 +1,56 @@
+/*--------------------------------------------
+Developer: Daphne
+Color Palette:
+#343a40
+#fff
+
+Fonts:
+'Lato', sans-serif;
+--------------------------------------------*/
+
+body {background-color: #d8d9da;}
+section{
+    width: 95%;
+    background-color: white;
+    padding: 1rem;
+}
+
+#newSong {
+    cursor: pointer;
+    color: #17a2b8;
+    font-size: 2rem;
+    padding: 0 .9rem .4rem;
+    border: 1px solid #fff;
+    border-radius: .25rem;
+}
+
+    #newSong:hover {
+          color: rgb(255,255,255);
+          background: #17a2b8;
+          border: 1px solid #17a2b8;
+    }
+
+#songs input[type="text"] {
+    max-width: 27rem;
+}
+
+#errors{
+    color: red;
+    font-weight: bold;
+}
+
+.hidden {
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 9000rem;
+}
+
+/*Global------------------------------------*/
+
+
+
+/*Header------------------------------------*/
+
+
+
