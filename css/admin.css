@@ -8,12 +8,16 @@ Fonts:
 'Lato', sans-serif;
 --------------------------------------------*/
 
-body {background-color: #d8d9da;}
+body {
+    background-color: #d8d9da;
+}
 section{
     width: 95%;
     background-color: white;
     padding: 1rem;
 }
+
+input {color: #197a8a;}
 
 #newSong {
     cursor: pointer;
@@ -37,6 +41,15 @@ section{
 #errors{
     color: red;
     font-weight: bold;
+    position: relative;
+}
+
+.errorEffectDiv {
+    border: 1px solid red;
+    padding: 1rem;
+    margin: 0 0 1rem;
+    border-radius: .25rem;
+    background: rgba(255, 201, 201, 0.5);
 }
 
 .hidden {
@@ -46,6 +59,26 @@ section{
     left: 9000rem;
 }
 
+label {
+}
+
+.warning {
+    color: red;
+    font-weight: bold;
+    font-size: 90%;
+}
+
+.coverWarning {
+    color: #17a2b8;
+    margin-top: -1rem;
+    font-weight: normal;
+}
+
+@media screen and (max-width: 700px) {
+    .coverWarning {
+       margin-top: -.5rem;
+    }
+}
 /*Global------------------------------------*/
 
 

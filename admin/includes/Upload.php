@@ -99,7 +99,7 @@ class Upload {
                 $this->messages[] = $file['name'] . ' was only partially uploaded.';
                 break;
             case 4:
-                $this->messages[] = 'No file submitted.';
+                // $this->messages[] = 'No file submitted.';
                 break;
             default:
                 $this->messages[] = 'Sorry, there was a problem uploading ' . $file['name'];

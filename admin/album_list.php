@@ -20,15 +20,15 @@ if (!$result) {
     <title>Admin <?php if (isset($title)) { echo " | $title";} ?></title>
     <link rel="icon" type="image/ico" href="images/logoring_.png">
 
-<!-- Links -->
+    <!-- Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     <link href="../styles/admin.css" rel="stylesheet" type="text/css">
 
-<!--Fonts -->
+    <!--Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
 
-<!-- Script -->
+    <!-- Script -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery.slim.min.js"></script>
     <script src="js/popper.min.js"></script>
@@ -46,6 +46,7 @@ if (!$result) {
         <th>Date Created</th>
         <th>Last Updated</th>
         <th>Name</th>
+        <!-- <th>AlbumID</th> -->
         <th>&nbsp;</th>
         <th>&nbsp;</th>
     </tr>
@@ -54,12 +55,13 @@ if (!$result) {
         <td><?= $row['dateCreated']; ?></td>
         <td><?= $row['dateUpdated']; ?></td>
         <td><?= $row['AlbumName']; ?></td>
-        <td><a href="http://localhost/phprevamp/admin/album_update.php?article_id=<?= $row['article_id']; ?>" class="text-info">EDIT</a></td>
-        <td><a href="http://localhost/phprevamp/admin/album_delete.php?article_id=<?= $row['article_id']; ?>" class="text-info">DELETE</a></td>
+        <td><a href="http://localhost/phprevamp/admin/album_update.php?AlbumID=<?= $row['AlbumID']; ?>" class="text-info">EDIT</a></td>
+        <td><a href="http://localhost/phprevamp/admin/album_delete.php?AlbumID=<?= $row['AlbumID']; ?>" class="text-info">DELETE</a></td>
     </tr>
     <?php } ?>
 </table>
 <?php } ?>
-<p><a href="http://localhost/phprevamp/admin/albumInsert.php" class="btn btn-outline-info">Insert new entry</a></p>
+<p><a href="http://localhost/phprevamp/admin/album_insert.php" class="btn btn-outline-info">Insert new entry</a></p>
+<script src="../js/limitSongList.js"></script>
 </body>
 </html>

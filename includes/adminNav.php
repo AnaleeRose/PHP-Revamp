@@ -28,7 +28,7 @@
 
                 </a>
             <?php } ?>
-                <a class="nav-item nav-link ml-auto" href="http://localhost:81/phprevamp/admin/album_list.php">ALBUMS</a>
+                <a class="nav-item nav-link ml-auto" href="http://localhost/phprevamp/admin/album_list.php">ALBUMS</a>
                 <a class="nav-item nav-link ml-auto" href="http://localhost/phprevamp/admin/fan_list.php">FANS</a>
             </div><!-- navbar -->
         </div>  <!-- collapse -->

@@ -1,7 +1,7 @@
 <?php
 $errors = [];
 $missing = [];
-$required = ['name', 'cover', 'song1'];
+$required = ['name', 'song1'];
 $expected = ['name', 'cover', 'song1', 'song2', 'song3', 'song4', 'song5', 'song6', 'song7', 'song8', 'song9', 'song10', 'song11', 'song12', 'song13', 'song14', 'song15', 'song16', 'song17', 'song18', 'song19', 'song20'];
 //required checks
 foreach ($_POST as $key => $value) {
@@ -14,13 +14,8 @@ foreach ($_POST as $key => $value) {
 
     }
 }
-
 $songlist = [];
-if (isset($_POST['insert']))
-{
-// sql code will go here...
-}
-
+// image checking
 require_once 'includes/upload.php';
 use includes\Upload;
 if (isset($_POST['insert']) && !$errors && !$missing) {
@@ -28,7 +23,7 @@ if (isset($_POST['insert']) && !$errors && !$missing) {
     $max = 5000000;
     require_once 'includes/upload.php';
     $albumName = $_POST['name'];
-    $albumName = preg_replace('/[^a-zA-Z0-9]/', '', $albumName);
+    $albumName = preg_replace('/[^a-zA-Z0-9-]/', '', $albumName);
     $extension = pathinfo($_FILES["cover"]["name"], PATHINFO_EXTENSION);
     try {
         $loader = new Upload($destination, $albumName);
@@ -36,14 +31,91 @@ if (isset($_POST['insert']) && !$errors && !$missing) {
         $loader->upload();
         // $loader->checkName($file);
         $result = $loader->getMessages();
-        echo $albumName;
-        echo $extension;
+        // echo $albumName;
+        // echo $extension;
     } catch (Exception $e) {
         echo $e->getMessage();
     }
 
+}
+// song/img name
+$i = 1;
+if (isset($_POST['insert'])) {
+    // clears songs of anything except the following and adds them to the songlist array for later
+    while ($i <= 20) {
+        $song = 'song' . $i;
+        if (!empty($_POST["$song"])) {
+            $songName = preg_replace('/[^a-zA-Z0-9\- ]/', '', $_POST["$song"]);
+            $songName = str_replace(' ', ".", $songName);
+            if ($songName) {array_push($songlist, $songName);}
+
+            if (!in_array($songName, $songlist)) {
+                $error .= "Could not upload $songName.";
+            }
+            echo $songName;
+        }
+        $i++;
+    }
 
 }
+
+//sql work
+// if (isset($_POST['insert'])) {
+//     require '../includes/connection.php';
+//     // initialize flag
+//     $OK = false;
+//     // create database connection
+//     $conn = dbConnect('admin');
+//     // initialize prepared statement
+//     $stmt = $conn->stmt_init();
+//     // create SQL
+//     $sql = 'INSERT INTO Albums (AlbumName, ImgType) VALUES(?, ?)';
+//     // bind parameters and execute statement
+//     if ($stmt->prepare($sql)) {
+//         // bind parameters and execute statement
+//         $stmt->bind_param('ss', $albumName, $extension);
+//         $stmt->execute();
+//         if ($stmt->affected_rows > 0) {
+//             $OK = true;
+//         }
+//     }
+//     // redirect if successful or display error
+//         $sql = 'SELECT AlbumID FROM Albums ORDER By dateCreated DESC LIMIT 1';
+//         // bind parameters and execute statement
+//         if ($stmt->prepare($sql)) {
+//             // bind parameters and execute statement
+//             $stmt->execute();
+//             $stmt->bind_result($albumID);
+//             while ($stmt->fetch()) {
+//                 foreach ($songlist as $value) {
+//                     $sql = "INSERT INTO Songs (AlbumID, Name) VALUES ('$albumID', '$value')";
+//                     // bind parameters and execute statement
+//                     if ($stmt->prepare($sql)) {
+//                         // bind parameters and execute statement
+//                         $stmt->execute();
+//                         if ($stmt->affected_rows > 0) {
+//                             $OK = true;
+//                         }
+//                     }
+//                 }
+//             }
+//         // header('Location: http://localhost/phpsols/admin/blog_list_mysqli.php');
+//         // exit;
+//         }
+
+//         if ($OK) {
+//             echo ('reroute dis bad boy');
+//             // header('Location: http://www.google.com');
+//             exit;
+//         } else {
+//             $error = $stmt->error;
+//         }
+//     }
+// query for an albums tracklist
+// SELECT s.Name, a.AlbumName FROM Albums AS a JOIN Songs AS s ON a.AlbumID=s.AlbumID WHERE a.AlbumID = 47;
+
+
+
 
 ?>
 <!DOCTYPE HTML>
@@ -60,26 +132,32 @@ if (isset($_POST['insert']) && !$errors && !$missing) {
 <!-- Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <link href="http://localhost:81/phprevamp/css/admin.css" rel="stylesheet" type="text/css">
+    <link href="http://localhost/phprevamp/css/admin.css" rel="stylesheet" type="text/css">
 
 <!--Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
 
 <!-- Script -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-<!--     <script src="js/jquery.slim.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script> -->
+    <script>var page = 'insert'</script>
+    <script src="../js/limitSongList.js" defer></script>
 </head>
 
 <body class="container">
 <?php
+?>
+<?php
 include '../includes/title.php';
-include '../includes/adminNav.php';
+// include '../includes/adminNav.php';
 ?>
 <section>
+    <?php
+    foreach ($songlist as $key => $value) {
+        $sql = "INSERT INTO Songs (AlbumID, Name) VALUES ('1', '$value')";
+        echo $sql;
+    }
+    ?>
 <h1 class="pb-3"><i class="fas fa-users-cog"></i> Albums | New Entry</h1>
-
     <div id="errors">
     <?php
     if ($missing || $errors) { ?>
@@ -90,40 +168,46 @@ include '../includes/adminNav.php';
     if (isset($result)) {
         echo '<ul>';
         foreach ($result as $message) {
-            echo "<li>$message</li>";
+            echo "<li class=\"errorEffect\">$message</li>";
         }
         echo '</ul>';
     }
     if (isset($error)) {
-        echo "<?>Error: $error</p>";
+        echo "<p class=\"errorEffect\">Error: $error</p>";
+    }
+    if (isset($missing)) {
+        echo '<ul id="errorList">';
+            foreach ($missing as $fixme) {
+                switch ($fixme) {
+                    case 'name':
+                        echo "<li class=\"errorEffect\">Missing: Album name</li>";
+                        break;
+                    case 'song1':
+                        echo "<li class=\"errorEffect\">Missing: At least one song</li>";
+                        break;
+                    case 'cover':
+                        echo "<li class=\"errorEffect\">Missing: Album Cover</li>";
+                        break;
+                }
+            }
+        echo '</ul>';
     }
     ?>
-    <?php
-    $i = 1;
-    $k = 1;
-    if (isset($_POST['insert'])) {
-        // user uploaded image
-        // loop through all the songs and pick all the names and assign them to an array for later
-        while ($i <= 20) {
-            $song = 'song' . $i;
-            if (!empty($_POST["$song"])) {
-                array_push($songlist, $_POST["$song"]);
-            }
-            $i++;
-        }
-    } ?>
+
     </div>
 
-<form method="post" actionb="" class="" enctype="multipart/form-data" name="insert">
+<form method="post" actionb="" class="" enctype="multipart/form-data" name="insert" id="insertForm">
     <p class="col-12 col-md-8 row">
-        <label for="name" class="col-12 col-sm-3 col-xl-2">Album Name:</label>
-        <input name="name" type="text" id="name" class="col-10 col-sm-9 col-xl-10 ml-3 ml-sm-0">
+        <label for="name" class="col-12 col-sm-3 ">Album Name:
+
+        </label>
+        <input name="name" type="text" id="name" class="col-10 col-sm-9 ml-3 ml-sm-0">
     </p>
     <p class="col-12 col-md-8 row">
-        <label for="cover"  class="col-12 col-sm-3 col-xl-2">Album Cover:</label>
-        <input name="cover" type="file" id="cover" class="col-10 col-sm-9 col-xl-10 ml-0 ml-sm-n3">
+        <label for="cover"  class="col-12 col-sm-3">Album Cover:</label>
+        <input name="cover" type="file" id="cover" class="col-10 col-sm-9 ml-0 ml-sm-n3">
     </p>
-    <h3 class="pb-3 pl-2">Track List:</h3>
+    <h3 class="pb-3 pl-2 tracks">Track List:</h3>
     <div id="songs" class="col-12">
         <p class="col-10 row">
             <label for="song1" class="col-3 col-md-2 col-xl-1">Title:</label>
@@ -138,8 +222,8 @@ include '../includes/adminNav.php';
             <input name="song3" type="text" id="song3" class="col-9 col-md-10 col-xl-11">
         </p>
         <p class="col-10 row hide">
-            <label for="song5" class="col-3 col-md-2 col-xl-1">Title:</label>
-            <input name="song5" type="text" id="song4" class="col-9 col-md-10 col-xl-11">
+            <label for="song4" class="col-3 col-md-2 col-xl-1">Title:</label>
+            <input name="song4" type="text" id="song4" class="col-9 col-md-10 col-xl-11">
         </p>
         <p class="col-10 row hide">
             <label for="song5" class="col-3 col-md-2 col-xl-1">Title:</label>
@@ -219,139 +303,7 @@ include '../includes/adminNav.php';
     </p>
 </form>
 </section>
-    <script>
-        var songLimit = false;
-        var songBtn = document.getElementById("newSong");
-        var songs = document.getElementById("songs");
-        songBtn.addEventListener("click", addSong);
-        var hide = songs.querySelectorAll(".hide");
-        var i = 0;
-        function addSong() {
-            var hidden = document.querySelector("p.hidden");
-            if (hidden) {
-                hidden.classList.remove('hidden');
-            } else {
-                var errorList = document.getElementById("errors");
-                var p = document.createElement("p");
-                var limitNotice = document.createTextNode("You've hit the song limit!");
-                p.classList.add("noMore")
-                if (!(document.querySelector(".noMore"))) {
-                    p.appendChild(limitNotice);
-                    errorList.appendChild(p);
-                }
-
-            }
-        }
-
-         function limit() {
-            var i = 0;
-           if (document.getElementById("song4").value == '') {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song5").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song6").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song7").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song8").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song9").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song10").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song11").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song12").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song13").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song14").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song15").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song16").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song17").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song18").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song19").value)) {
-            hide[i].classList.add('hidden');
-           };
-           i++;
-           if (!(document.getElementById("song20").value)) {
-            hide[i].classList.add('hidden');
-           };
-           }
-        limit();
-        // cool function that added new song inputs... doesnt work with php ;-;
-        // function addSong() {
-        //     if (songLimit == false) {
-        //     var p = document.createElement("p");
-        //     var label = document.createElement("label");
-        //     var title = document.createTextNode("Title:");
-        //     var input = document.createElement("input");
-        //     p.classList.add("col-10", "row");
-        //     label.setAttribute("for", "song".concat(i));
-        //     label.classList.add("col-3", "col-md-2", "col-xl-1");
-        //     label.appendChild(title);
-        //     input.setAttribute("name", "song".concat(i));
-        //     input.setAttribute("id", "song".concat(i));
-        //     input.setAttribute("type", "text");
-        //     input.classList.add("col-9", "col-md-10", "col-xl-11");
-        //     p.appendChild(label);
-        //     p.appendChild(input);
-        //     songs.appendChild(p);
-        //     limit();
-        //     } else {
 
 
-        //     }
-
-        // }
-
-        // function limit() {
-        //     if (i <= 15) {
-        //     i++} else {
-        //         songLimit = true;
-        //         var errorList = document.getElementById("errors")
-        //         var p = document.createElement("p");
-        //         var limitNotice = document.createTextNode("You've hit the song limit!");
-        //         p.appendChild(limitNotice);
-        //         errorList.appendChild(p);
-        //     }
-        //     console.log(i)
-        // }
-    </script>
 </body>
 </html>
