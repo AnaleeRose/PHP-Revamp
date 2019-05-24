@@ -4,6 +4,7 @@ require_once '../includes/connection.php';
 // intialize flags
 $OK = false;
 $done = false;
+$albumID = 0;
 // checking to see you didn't delete everything
 $errors = [];
 $missing = [];
@@ -43,7 +44,6 @@ if (isset($_GET['AlbumID']) && !$_POST) {
         $OK = $stmt->execute();
         // bind the results to the variables
         $stmt->bind_result($albumID, $albumName, $songName);
-        $stmt->fetch();
         $i = 0;
        while ($stmt->fetch()) {
             echo $albumID;
@@ -100,20 +100,20 @@ if (isset($_POST['update'])) {
         if ($stmt->prepare($sql3)) {
             // bind parameters and execute statement
             $stmt->execute();
-            $stmt->bind_param($_GET['AlbumID']);
+            $stmt->bind_param('i', $_GET['AlbumID']);
             $stmt->bind_result($albumID);
             while ($stmt->fetch()) {
-                foreach ($songlist as $value) {
-                    $sql4 = "INSERT INTO Songs (AlbumID, Name) VALUES ('$albumID', '$value')";
-                    // bind parameters and execute statement
-                    if ($stmt->prepare($sql4)) {
-                        // bind parameters and execute statement
-                        $stmt->execute();
-                        if ($stmt->affected_rows > 0) {
-                            $OK = true;
-                        }
-                    }
-                }
+                // foreach ($songlist as $value) {
+                //     $sql4 = "INSERT INTO Songs (AlbumID, Name) VALUES ('$albumID', '$value')";
+                //     // bind parameters and execute statement
+                //     if ($stmt->prepare($sql4)) {
+                //         // bind parameters and execute statement
+                //         $stmt->execute();
+                //         if ($stmt->affected_rows > 0) {
+                //             $OK = true;
+                //         }
+                //     }
+                // }
             }
         // header('Location: http://localhost/phpsols/admin/blog_list_mysqli.php');
         // exit;
