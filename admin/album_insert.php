@@ -132,7 +132,7 @@ if (isset($_POST['insert'])) {
 <!-- Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <link href="http://localhost/phprevamp/css/admin.css" rel="stylesheet" type="text/css">
+    <link href="http://localhost:81/phprevamp/css/admin.css" rel="stylesheet" type="text/css">
 
 <!--Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
@@ -148,7 +148,7 @@ if (isset($_POST['insert'])) {
 ?>
 <?php
 include '../includes/title.php';
-// include '../includes/adminNav.php';
+include '../includes/adminNav.php';
 ?>
 <section>
     <?php
