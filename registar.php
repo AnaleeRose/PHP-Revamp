@@ -59,12 +59,24 @@ $sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$
 	    <h1><i class="fas fa-users-cog"></i> Admin</h1>
 	<?php if (!isset($_SESSION['name'])) { ?>
 	    <form  method="post" action="" name="login" id="login">
-	    	<label for="username">Username: </label>
-	    	<input type="text" name="username" id="username">
+	    	<p class="col-12 col-md-8 row">
+		    	<label for="username">Username: </label>
+		    	<input type="text" name="username" id="username">
+	    	</p>
+			<p class="col-12 col-md-8 row">
+		    	<label for="pwd">Password: </label>
+		    	<input type="text" name="pwd" id="pwd">
+		    </p>
 
-	    	<label for="password">Password: </label>
-	    	<input type="text" name="password" id="password">
+		    <p class="col-12 col-md-8 row">
+		    	<label for="pwdC">Confirm Password: </label>
+		    	<input type="text" name="pwdC" id="pwdC">
+		    </p>
 
+			<p class="col-12 col-md-8 row">
+		    	<label for="email">Email: </label>
+		    	<input type="text" name="email" id="email">
+			</p>
 	    	<input type="submit" name="loginBtn" id="loginBtn" value="login" class="d-block btn btn-outline-info my-3">
 	    </form>
 	<?php } else { ?>
@@ -74,8 +86,41 @@ $sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$
 	    </section>
 	}
 	</div>
+
+	<script>
+		var allLabels = document.body.querySelectorAll("label");
+		var maxL = allLabels.length;
+
+
+		var allTextInputs = document.body.querySelectorAll('input[type="text"]');
+		var maxTI = allTextInputs.length;
+
+
+		function labelClasses() {
+				var i = 0;
+			do {
+				let label = allLabels[i];
+				label.classList.add("col-12", "col-md-4" )
+				i++;
+
+			} while (i < maxL)
+		}
+
+		function inputClasses() {
+				var i = 0;
+			do {
+				let input = allTextInputs[i];
+				input.classList.add("col-12", "col-md-8");
+				i++;
+
+			} while (i < maxTI)
+		}
+
+		labelClasses();
+		inputClasses();
+
+	</script>
 </body>
 </html>
 
-</body>
-</html>
+

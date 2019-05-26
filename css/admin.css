@@ -17,7 +17,7 @@ section{
     padding: 1rem;
 }
 
-input {color: #197a8a;1}
+input {color: #197a8a;}
 
 #newSong {
     cursor: pointer;
@@ -34,7 +34,7 @@ input {color: #197a8a;1}
           border: 1px solid #17a2b8;
     }
 
-#songs input[type="text"] {
+.smallInputs input[type="text"] {
     max-width: 27rem;
 }
 
