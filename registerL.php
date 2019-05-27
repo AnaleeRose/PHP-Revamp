@@ -37,14 +37,11 @@ if (isset($_POST['registerBtn'])) {
 	$pwdC = trim($_POST['pwdC']);
 	$email = trim($_POST['email']);
 
-	$checkPwd = new CheckPassword($pwd);
-	$checkPwd->requireMixedCase();
-	$checkPwd->requireNumbers(1);
+	$checkPwd = new CheckPassword($pwd, 3);
+	// $checkPwd->requireMixedCase();
+	// $checkPwd->requireNumbers(1);
 	$pwdOk = $checkPwd->check();
-	if ($pwdOk) {
-		// $passCheckResult = ['Password OK'];
-		$pwd = password_hash($pwd, PASSWORD_DEFAULT);
-	} else {
+	if (!$pwdOk) {
 		$passCheckResult = $checkPwd->getErrors();
 	}
 
@@ -82,7 +79,7 @@ if ($allOk) {
 	$conn = dbConnect('admin');
 	$stmt = $conn->stmt_init();
     // create SQL
-    $sql = 'INSERT INTO admin (Username, Password, Email) VALUES(?, ?, ?)';
+    $sql = 'INSERT INTO admin (Username, Password, Email) VALUES(?, SHA1(?), ?)';
     // bind parameters and execute statement
     if ($stmt->prepare($sql)) {
         // bind parameters and execute statement
@@ -145,7 +142,7 @@ $conn = dbConnect('admin');
 	    <?php //require './includes/HTML/adminNav.php'; ?>
 	    <section>
 	    	<?php
-	    	// tester2 tester2A
+	    	// testAdmin testAdminPass1
 	    	if (isset($_POST['registerBtn'])) {
 	    	switch ($insertedCheck) {
 	    		case 'sent':

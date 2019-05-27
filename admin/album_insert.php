@@ -50,7 +50,7 @@ if (isset($_POST['insert'])) {
             if ($songName) {array_push($songlist, $songName);}
 
             if (!in_array($songName, $songlist)) {
-                $error .= "Could not upload $songName.";
+                $error .= "Could nfot upload $songName.";
             }
             echo $songName;
         }

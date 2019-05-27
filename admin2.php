@@ -1,26 +1,43 @@
 <?php
 $error = '';
-require_once './includes/connection.php';
+require_once './includes/Authenticate/connection.php';
 $loginPage = 'yep';
 
 if (isset($_POST['loginBtn'])) {
 	session_start();
         ob_start();
-	$adminUsername = $_POST['username'];
+	$username = $_POST['username'];
+	$adminUsername = filter_var($username, FILTER_SANITIZE_STRING);
 	$adminPassword = $_POST['password'];
+	$adminPasswordHash = password_hash($adminPassword, PASSWORD_DEFAULT);
 	$_SESSION['username'] = $_POST['username'];
 }
-include './includes/title.php';
-require_once './includes/connection.php';
-require_once './includes/logout.php';
+include './includes/HTML/title.php';
+require_once './includes/Authenticate/logout.php';
 
 // create database connection
 $conn = dbConnect('admin');
-$sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$adminPassword'";
-// $result = $conn->query
-// if (!$result) {
-//     $error = $conn->error;
-// }
+if (isset($_POST['loginBtn'])) {
+	$stmt = $conn->stmt_init();
+	$sql = "SELECT Password FROM admin WHERE Username = ?";
+	 if ($stmt->prepare($sql)) {
+        // bind parameters and execute statement
+        $stmt->bind_param('s', $adminUsername);
+        $stmt->execute();
+        $stmt->bind_result($answer);
+        $stmt->fetch();
+        if (isset($answer)) {
+        	echo $adminPasswordHash;
+        	echo $answer;
+        	if (password_verify($adminPasswordHash, $answer) || $adminPassword == $answer) {
+        		echo "verfied!";
+        	}else {echo "nope, not verfied...";}
+        	echo "Welcome $adminUsername";
+        } else {
+        	echo "<p class=\"warning\">That user doesn't exist...";
+        }
+    }
+}
 
 
 
@@ -46,15 +63,12 @@ $sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$
 	<link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
 
 <!-- Script -->
-<!-- 	<script src="js/jquery.slim.min.js"></script>
-	<script src="js/popper.min.js"></script>
-	<script src="js/bootstrap.min.js"></script> -->
 
 </head>
 <body class="container-fluid">
 	<div class="col-12 col-md-10 offset-md-1">
 
-	    <?php require './includes/adminNav.php'; ?>
+	    <?php // require './includes/HTML/adminNav.php'; ?>
 	    <section>
 	    <h1><i class="fas fa-users-cog"></i> Admin</h1>
 	<?php if (!isset($_SESSION['name'])) { ?>
@@ -72,7 +86,6 @@ $sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$
 	<?php } ?>
 
 	    </section>
-	}
 	</div>
 </body>
 </html>

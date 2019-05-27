@@ -74,9 +74,20 @@ label {
     font-weight: normal;
 }
 
+.registerSmall {
+    padding-left: 1rem;
+    }
+
+.registerSmallE {
+    padding-left: 1.5rem;
+    }
 @media screen and (max-width: 700px) {
     .coverWarning {
        margin-top: -.5rem;
+    }
+
+    .registerSmall {
+        padding-left: 0;
     }
 }
 /*Global------------------------------------*/
@@ -84,6 +95,5 @@ label {
 
 
 /*Header------------------------------------*/
-
 
 

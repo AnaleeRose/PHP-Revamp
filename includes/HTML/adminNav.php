@@ -30,4 +30,4 @@
         </div>  <!-- collapse -->
     </div><!-- container -->
   </nav><!-- nav -->
-  <p class="space" style="margin-bottom: 5rem; color: rgba(255,255,255,.0)">margin</p>
+  <p class="space" style="margin-bottom: 3.5rem; color: rgba(255,255,255,.0)">margin</p>

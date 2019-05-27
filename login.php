@@ -1,26 +1,40 @@
 <?php
 $error = '';
-require_once './includes/connection.php';
+require_once './includes/Authenticate/connection.php';
 $loginPage = 'yep';
 
 if (isset($_POST['loginBtn'])) {
 	session_start();
         ob_start();
-	$adminUsername = $_POST['username'];
+	$username = $_POST['username'];
+	$adminUsername = filter_var($username, FILTER_SANITIZE_STRING);
 	$adminPassword = $_POST['password'];
+	$adminPasswordHash = password_hash($adminPassword, PASSWORD_DEFAULT);
 	$_SESSION['username'] = $_POST['username'];
 }
-include './includes/title.php';
-require_once './includes/connection.php';
-require_once './includes/logout.php';
+include './includes/HTML/title.php';
+require_once './includes/Authenticate/logout.php';
 
 // create database connection
 $conn = dbConnect('admin');
-$sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$adminPassword'";
-// $result = $conn->query
-// if (!$result) {
-//     $error = $conn->error;
-// }
+if (isset($_POST['loginBtn'])) {
+	$stmt = $conn->stmt_init();
+	$sql = "SELECT Username, Password, Email FROM admin WHERE Username = '$adminUsername' AND Password = SHA1('$adminPassword')";
+	 if ($stmt->prepare($sql)) {
+        // bind parameters and execute statement
+        $stmt->execute();
+        $stmt->bind_result($usernameDB, $pwdDB, $emailDB);
+        $stmt->fetch();
+        if (isset($pwdDB)) {
+            $_SESSION['username'] = $usernameDB;
+        	$_SESSION['email'] = $emailDB;
+            echo $_SESSION['username'];
+            echo $_SESSION['email'];
+        } else {
+        	echo "<p class=\"warning\">That user doesn't exist...";
+        }
+    }
+}
 
 
 
@@ -46,37 +60,22 @@ $sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$
 	<link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
 
 <!-- Script -->
-<!-- 	<script src="js/jquery.slim.min.js"></script>
-	<script src="js/popper.min.js"></script>
-	<script src="js/bootstrap.min.js"></script> -->
 
 </head>
 <body class="container-fluid">
 	<div class="col-12 col-md-10 offset-md-1">
 
-	    <?php require './includes/adminNav.php'; ?>
+	    <?php // require './includes/HTML/adminNav.php'; ?>
 	    <section>
 	    <h1><i class="fas fa-users-cog"></i> Admin</h1>
 	<?php if (!isset($_SESSION['name'])) { ?>
 	    <form  method="post" action="" name="login" id="login">
-	    	<p class="col-12 col-md-8 row">
-		    	<label for="username">Username: </label>
-		    	<input type="text" name="username" id="username">
-	    	</p>
-			<p class="col-12 col-md-8 row">
-		    	<label for="pwd">Password: </label>
-		    	<input type="text" name="pwd" id="pwd">
-		    </p>
+	    	<label for="username">Username: </label>
+	    	<input type="text" name="username" id="username">
 
-		    <p class="col-12 col-md-8 row">
-		    	<label for="pwdC">Confirm Password: </label>
-		    	<input type="text" name="pwdC" id="pwdC">
-		    </p>
+	    	<label for="password">Password: </label>
+	    	<input type="text" name="password" id="password">
 
-			<p class="col-12 col-md-8 row">
-		    	<label for="email">Email: </label>
-		    	<input type="text" name="email" id="email">
-			</p>
 	    	<input type="submit" name="loginBtn" id="loginBtn" value="login" class="d-block btn btn-outline-info my-3">
 	    </form>
 	<?php } else { ?>
@@ -84,43 +83,13 @@ $sql = "SELECT id FROM admin WHERE Username = '$adminUsername' and Password = '$
 	<?php } ?>
 
 	    </section>
-	}
 	</div>
-
-	<script>
-		var allLabels = document.body.querySelectorAll("label");
-		var maxL = allLabels.length;
-
-
-		var allTextInputs = document.body.querySelectorAll('input[type="text"]');
-		var maxTI = allTextInputs.length;
-
-
-		function labelClasses() {
-				var i = 0;
-			do {
-				let label = allLabels[i];
-				label.classList.add("col-12", "col-md-4" )
-				i++;
-
-			} while (i < maxL)
-		}
-
-		function inputClasses() {
-				var i = 0;
-			do {
-				let input = allTextInputs[i];
-				input.classList.add("col-12", "col-md-8");
-				i++;
-
-			} while (i < maxTI)
-		}
-
-		labelClasses();
-		inputClasses();
-
-	</script>
 </body>
 </html>
 
+</body>
+</html>
+<?php
+ob_end_flush();
+session_destroy();
 
