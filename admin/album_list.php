@@ -1,6 +1,8 @@
 <?php
-include '../includes/title.php';
-require_once '../includes/connection.php';
+session_start();
+ob_start();
+include '../includes/HTML/title.php';
+require_once '../includes/Authenticate/connection.php';
 // create database connection
 $conn = dbConnect('admin');
 $sql = 'SELECT * FROM Albums ORDER BY dateUpdated DESC';
@@ -8,6 +10,8 @@ $result = $conn->query($sql);
 if (!$result) {
     $error = $conn->error;
 }
+
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -23,7 +27,7 @@ if (!$result) {
     <!-- Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <link href="../styles/admin.css" rel="stylesheet" type="text/css">
+    <link href="../css/admin.css" rel="stylesheet" type="text/css">
 
     <!--Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
@@ -36,7 +40,8 @@ if (!$result) {
 </head>
 
 <body class="container-fluid">
- <?php require './../includes/adminNav.php'; ?>
+    <section>
+ <?php require './../includes/HTML/adminNav.php'; ?>
 <h1><i class="fas fa-users-cog"></i> Albums</h1>
 <?php if (isset($error)) {
     echo "<p>$error</p>";
@@ -54,14 +59,18 @@ if (!$result) {
     <tr>
         <td><?= $row['dateCreated']; ?></td>
         <td><?= $row['dateUpdated']; ?></td>
-        <td><?= $row['AlbumName']; ?></td>
-        <td><a href="http://localhost/phprevamp/admin/album_update.php?AlbumID=<?= $row['AlbumID']; ?>" class="text-info">EDIT</a></td>
-        <td><a href="http://localhost/phprevamp/admin/album_delete.php?AlbumID=<?= $row['AlbumID']; ?>" class="text-info">DELETE</a></td>
+        <td><?php $aName = str_replace('.', ' ', $row['AlbumName']); echo $aName; ?></td>
+        <td><a href="http://localhost:81/phprevamp/admin/album_update.php?AlbumID=<?= $row['AlbumID']; ?>" class="text-info">EDIT</a></td>
+        <td><a href="http://localhost:81/phprevamp/admin/album_delete.php?AlbumID=<?= $row['AlbumID']; ?>" class="text-info">DELETE</a></td>
     </tr>
     <?php } ?>
 </table>
 <?php } ?>
-<p><a href="http://localhost/phprevamp/admin/album_insert.php" class="btn btn-outline-info">Insert new entry</a></p>
+<p><a href="http://localhost:81/phprevamp/admin/album_insert.php" class="btn btn-outline-info">Insert new entry</a></p>
 <script src="../js/limitSongList.js"></script>
+</section>
 </body>
 </html>
+<?php
+ob_end_flush();
+?>

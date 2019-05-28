@@ -14,20 +14,25 @@
 
         <div class="collapse navbar-collapse" id="myTogglerNav">
             <div class="navbar-nav ml-auto"><!-- ml-auto .. to shift to the right -->
-                <a class="nav-item nav-link ml-auto link" href="http://localhost/phprevamp/admin.php"><?php
+                <a class="nav-item nav-link ml-auto link" href=<?php if (session_status() == PHP_SESSION_NONE) {
+                            echo '"http://localhost:81/phprevamp/login.php"';
+                        } else {
+                            echo "http://localhost:81/phprevamp/profile.php";
+                        }?>>
+                <?php
 
                     if (session_status() == PHP_SESSION_NONE) {
                             echo 'LOGIN';
                         } else {
-                            echo 'LOGOUT';
+                            echo 'PROFILE';
                         }
                 ?>
 
                 </a>
-                <a class="nav-item nav-link ml-auto" href="http://localhost/phprevamp/admin/album_list.php">ALBUMS</a>
-                <a class="nav-item nav-link ml-auto" href="http://localhost/phprevamp/admin/fan_list.php">FANS</a>
+                <a class="nav-item nav-link ml-auto" href="http://localhost:81/phprevamp/admin/album_list.php">ALBUMS</a>
+                <a class="nav-item nav-link ml-auto" href="http://localhost:81/phprevamp/admin/fan_list.php">FANS</a>
             </div><!-- navbar -->
         </div>  <!-- collapse -->
     </div><!-- container -->
   </nav><!-- nav -->
-  <p class="space" style="margin-bottom: 3.5rem; color: rgba(255,255,255,.0)">margin</p>
+  <p class="space" style="color: rgba(255,255,255,.0)">margin</p>

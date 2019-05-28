@@ -1,4 +1,16 @@
 <?php
+session_start();
+ob_start();
+$loginPage= 'yep';
+if (isset($_SESSION['name'])) {
+        $name = $_SESSION['name'];
+     }
+if (isset($_SESSION['email'])) {
+        $email = $_SESSION['email'];
+     }
+if (isset($_SESSION['ID'])) {
+        $ID = $_SESSION['ID'];
+     }
 use includes\Authenticate\CheckPassword;
 $error = '';
 $loginPage = 'yep';
@@ -31,55 +43,55 @@ require './includes/Authenticate/logout.php';
 require './includes/Authenticate/checkPassword.php';
 
 if (isset($_POST['registerBtn'])) {
-	// check the password strength
-		$username = trim($_POST['username']);
-		$pwd = trim($_POST['pwd']);
-		$pwdC = trim($_POST['pwdC']);
-		$email = trim($_POST['email']);
+// check the password strength
+	$username = trim($_POST['username']);
+	$pwd = trim($_POST['pwd']);
+	$pwdC = trim($_POST['pwdC']);
+	$email = trim($_POST['email']);
 
-		$checkPwd = new CheckPassword($pwd, 3);
-		// $checkPwd->requireMixedCase();
-		// $checkPwd->requireNumbers(1);
-		$pwdOk = $checkPwd->check();
-		if (!$pwdOk) {
-			$passCheckResult = $checkPwd->getErrors();
-		}
-
-	// sanitizing the username
-		$username = filter_var($username, FILTER_SANITIZE_STRING);
-
-		if ($username === $_POST['username']) {
-			$usernameOk = true;
-		}
-
-	// checking/validating the email
-	$email = filter_var($email, FILTER_SANITIZE_EMAIL);
-	if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-	    $emailOk = true;
-	} else {
-	    $emailOk = false;
+	$checkPwd = new CheckPassword($pwd, 3);
+	// $checkPwd->requireMixedCase();
+	// $checkPwd->requireNumbers(1);
+	$pwdOk = $checkPwd->check();
+	if (!$pwdOk) {
+		$passCheckResult = $checkPwd->getErrors();
 	}
 
-	// checking the conf pass
-	if (isset($_POST['pwd']) && ($_POST['pwdC'] == $_POST['pwd'])) {
-		$pwdConfOk = true;
-	} else {
-		$pwdConfOk = false;
+// sanitizing the username
+	$username = filter_var($username, FILTER_SANITIZE_STRING);
+
+	if ($username === $_POST['username']) {
+		$usernameOk = true;
 	}
 
+// checking/validating the email
+$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+    $emailOk = true;
+} else {
+    $emailOk = false;
+}
 
-	//checking if everything passes inspection
-	if ($pwdOk == true && $usernameOk == true && $emailOk == true && $pwdConfOk == true) {
-			$allOk = true;
-		}
-	// sending the info to the DB
+// checking the conf pass
+if (isset($_POST['pwd']) && ($_POST['pwdC'] == $_POST['pwd'])) {
+	$pwdConfOk = true;
+} else {
+	$pwdConfOk = false;
+}
+
+
+//checking if everything passes inspection
+if ($pwdOk == true && $usernameOk == true && $emailOk == true && $pwdConfOk == true) {
+		$allOk = true;
+	}
+// sending the info to the DB
 
 	if ($allOk) {
 			// // add 2 database
 		$conn = dbConnect('admin');
 		$stmt = $conn->stmt_init();
 	    // create SQL
-	    $sql = 'INSERT INTO admin (Username, Password, Email) VALUES(?, SHA1(?), ?)';
+	    $sql = 'UPDATE admin SET Username = ?, Password = SHA(?), Email = ? WHERE AdminID = $ID';
 	    // bind parameters and execute statement
 	    if ($stmt->prepare($sql)) {
 	        // bind parameters and execute statement
@@ -88,9 +100,10 @@ if (isset($_POST['registerBtn'])) {
 	        if ($stmt->affected_rows > 0) {
 	            $insertedCheck = 'sent';
 	        } else {$insertedCheck = 'failed';}
-	    } else {
+	    }
+
+	} else {
 		echo "I can't seem to reach the database... Please check back later!";
-		}
 	}
 }
 
@@ -206,13 +219,11 @@ $conn = dbConnect('admin');
 	    <form  method="post" action="" name="register" id="register" class="">
 	    	<p class="formP">
 		    	<label for="username">Username: </label>
-		    	<input type="text" name="username" id="username" <?php if (($missing || $errors ||isset($passCheckResult) || $usernameOk || $pwdConfOk)) {
-                    echo 'value="' . htmlentities($username) . '"';
-                } ?>>
+		    	<input type="text" name="username" id="username">
 	    	</p>
 			<p class="formP">
 		    	<label for="pwd">Password: </label>
-		    	<input type="text" name="pwd" id="pwd" >
+		    	<input type="text" name="pwd" id="pwd">
 		    	<small class="text-info registerSmall">The password must have no spaces, be at least 8 characters long, and have at least one of each of the following: an uppercase letter, a lowercase letter, and a number.</small>
 		    </p>
 
@@ -223,9 +234,7 @@ $conn = dbConnect('admin');
 
 			<p class="formP">
 		    	<label for="email">Email: </label>
-		    	<input type="text" name="email" id="email" <?php if (($missing || $errors ||isset($passCheckResult) || $usernameOk || $pwdConfOk)) {
-                    echo 'value="' . htmlentities($email) . '"';
-                } ?>>
+		    	<input type="text" name="email" id="email">
 			</p>
 	    	<input type="submit" name="registerBtn" id="registerBtn" value="Create Account" class="d-block btn btn-outline-info my-3">
 	    </form>

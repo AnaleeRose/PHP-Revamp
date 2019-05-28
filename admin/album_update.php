@@ -1,10 +1,14 @@
 <?php
-include '../includes/title.php';
-require_once '../includes/connection.php';
+use includes\Authenticate\CheckPassword;
+session_start();
+ob_start();
+include '../includes/HTML/title.php';
+require_once '../includes/Authenticate/connection.php';
 // intialize flags
 $OK = false;
 $done = false;
-$albumID = 0;
+$currentAlbumID = $_GET['AlbumID'];
+$albumName = 'Unknown';
 // checking to see you didn't delete everything
 $errors = [];
 $missing = [];
@@ -25,108 +29,172 @@ $conn = dbConnect('admin');
 // intialize statment
 $stmt = $conn->stmt_init();
 
-$songList = [];
+
+
+
+
+
+
+
+
+
+
 
 // track how many songs there are
 $k = 0;
-$s = 1;
 $kcheck = true;
 $kCount = 1;
+
+
 // get details of selected record
-if (isset($_GET['AlbumID']) && !$_POST) {
+if (isset($_GET['AlbumID'])) {
+    $cAlbumID = $_GET['AlbumID'];
     // prepare SQL query
-    $sql1 = 'SELECT a.AlbumID, a.AlbumName, s.Name FROM Albums AS a JOIN Songs AS s ON a.AlbumID=s.AlbumID WHERE a.AlbumID = ?';
-    $stmt->prepare($sql1);
-    if ($stmt->prepare($sql1)) {
-        //bind the query parameter
-        $stmt->bind_param('i', $_GET['AlbumID']);
-        // execute the query, and fetch the result
-        $OK = $stmt->execute();
-        // bind the results to the variables
-        $stmt->bind_result($albumID, $albumName, $songName);
-        $i = 0;
-       while ($stmt->fetch()) {
-            echo $albumID;
+    $query = "SELECT a.AlbumID, a.AlbumName, a.ImgType, s.Name FROM Albums AS a JOIN Songs AS s ON a.AlbumID=s.AlbumID WHERE a.AlbumID = $cAlbumID";
+    $result = $conn->query($query);
+    $i=0;
+    if ($result) {
+        // output data of each row
+        while($row = $result->fetch_assoc()) {
+            $albumID = $row['AlbumID'];
+            // echo $albumID;
+            $albumName = $row['AlbumName'];
             $albumName = str_replace('.', ' ', $albumName);
-            echo $albumName;
+            // echo $albumName;
+            $prevExtension = $row['ImgType'];
+            $songName = $row['Name'];
             $songName = str_replace('.', ' ', $songName);
-            echo $songName;
+            // echo $songName;
+
             $song[$i] = $songName;
             $kCount = (count($song) - 1);
             $i++;
        }
+    } else {
+        echo "0 results";
     }
-}
+    $conn->close();
+    // $stmt = $conn->stmt_init();
+    //
+    // if ($stmt->prepare($query)) {
+    //     //bind the query parameter
+    //     $stmt->bind_param('i', $_GET['AlbumID']);
+    //     // execute the query, and fetch the result
+    //     $OK = $stmt->execute();
+    //     // bind the results to the variables
+    //     $stmt->bind_result($albumID, $albumName, $songName);
+    //     $i = 0;
+    //    while ($stmt->fetch()) {
+    //         echo $albumID;
+    //         $albumName = str_replace('.', ' ', $albumName);
+    //         echo $albumName;
+    //         $songName = str_replace('.', ' ', $songName);
+    //         echo $songName;
+    //         $song[$i] = $songName;
+    //         $kCount = (count($song) - 1);
+    //         $i++;
+    //    }
+
+    }
+
 
 require_once 'includes/upload.php';
 use includes\Upload;
 if (isset($_POST['update'])) {
+    // setup
     $destination = '../images/user-images/';
     $max = 5000000;
-    require_once 'includes/upload.php';
+    // creates the new album name
     $newAlbumName = $_POST['name'];
-    $newAlbumName = preg_replace('/[^a-zA-Z0-9-]/', '', $newAlbumName);
+    $newAlbumName = str_replace(' ', '.', $_POST['name']);
+    $newAlbumName = preg_replace('/[^a-zA-Z0-9-(-)-.-]/', '', $newAlbumName);
+    echo $newAlbumName;
     $extension = pathinfo($_FILES["cover"]["name"], PATHINFO_EXTENSION);
+    if (empty($extension)) {
+        $extension = $prevExtension;
+    }
+    // checks the image and name
     try {
         $loader = new Upload($destination, $newAlbumName);
         $loader->setMaxSize($max);
         $loader->upload();
-        // $loader->checkName($file);
+        $loader->checkName($_FILES["cover"]);
         $result = $loader->getMessages();
-        // echo $newAlbumName;
-        // echo $extension;
     } catch (Exception $e) {
         echo $e->getMessage();
     }
-}
 
-if (isset($_POST['update'])) {
-    // initialize flag
+    //updates the album
     $OK = false;
     // create SQL
-    $sql2 = 'INSERT INTO Albums (AlbumName, ImgType) VALUES(?, ?) WHERE AlbumID = ?';
+    $conn = dbConnect('admin');
+    $newAlbumName = "'".$newAlbumName."'";
+    $extension = "'".$extension."'";
+    $sql = "UPDATE Albums SET AlbumName = $newAlbumName, ImgType = $extension WHERE AlbumID = $currentAlbumID";
+    if (!mysqli_query($conn, $sql)) {
+        echo "Error...";
+    }
+//     $sql3 = 'SELECT AlbumID FROM Albums WHERE AlbumID = ? ORDER By dateCreated DESC LIMIT 1';
+//     // bind parameters and execute statement
+    // $stmt = $conn->stmt_init();
+    // if ($stmt->prepare($sql)) {
+        // bind parameters and execute statement
+        // $stmt->execute();
+        // $stmt->bind_param('i', $_GET['AlbumID']);
+        // $stmt->bind_result($albumID);
+        // while ($stmt->fetch()) {
+        //     foreach ($songlist as $value) {
+        //         $sql4 = "INSERT INTO Songs (AlbumID, Name) VALUES ('$currentAlbumID', '$value')";
+        //         // bind parameters and execute statement
+        //         if ($stmt->prepare($sql4)) {
+        //             // bind parameters and execute statement
+        //             $stmt->execute();
+        //             if ($stmt->affected_rows > 0) {
+        //                 $OK = true;
+        //             }
+        //         }
+        //     }
+        // }
+    }
+//         // header('Location: http://localhost:81/phpsols/admin/blog_list_mysqli.php');
+//         // exit;
+//         }
+    // $updatedAlbum = mysqli_query($sql, MYSQLI_STORE_RESULT);}
     // bind parameters and execute statement
-    if ($stmt->prepare($sql2)) {
-        // bind parameters and execute statement
-        $stmt->bind_param('ssi', $newAlbumName, $extension, $_GET['AlbumID']);
-        $stmt->execute();
-        if ($stmt->affected_rows > 0) {
-            $OK = true;
-        }
-    }
-    // redirect if successful or display error
-        $sql3 = 'SELECT AlbumID FROM Albums WHERE AlbumID = ? ORDER By dateCreated DESC LIMIT 1';
-        // bind parameters and execute statement
-        if ($stmt->prepare($sql3)) {
-            // bind parameters and execute statement
-            $stmt->execute();
-            $stmt->bind_param('i', $_GET['AlbumID']);
-            $stmt->bind_result($albumID);
-            while ($stmt->fetch()) {
-                // foreach ($songlist as $value) {
-                //     $sql4 = "INSERT INTO Songs (AlbumID, Name) VALUES ('$albumID', '$value')";
-                //     // bind parameters and execute statement
-                //     if ($stmt->prepare($sql4)) {
-                //         // bind parameters and execute statement
-                //         $stmt->execute();
-                //         if ($stmt->affected_rows > 0) {
-                //             $OK = true;
-                //         }
-                //     }
-                // }
-            }
-        // header('Location: http://localhost/phpsols/admin/blog_list_mysqli.php');
-        // exit;
-        }
 
-        if ($OK) {
-            echo ('reroute dis bad boy');
-            // header('Location: http://www.google.com');
-            exit;
-        } else {
-            $error = $stmt->error;
-        }
-    }
+//     $sql3 = 'SELECT AlbumID FROM Albums WHERE AlbumID = ? ORDER By dateCreated DESC LIMIT 1';
+//     // bind parameters and execute statement
+//     $stmt = $conn->stmt_init();
+//     if ($stmt->prepare($sql3)) {
+//         // bind parameters and execute statement
+//         $stmt->execute();
+//         $stmt->bind_param('i', $_GET['AlbumID']);
+//         $stmt->bind_result($albumID);
+//         while ($stmt->fetch()) {
+//             foreach ($songlist as $value) {
+//                 $sql4 = "INSERT INTO Songs (AlbumID, Name) VALUES ('$currentAlbumID', '$value')";
+//                 // bind parameters and execute statement
+//                 if ($stmt->prepare($sql4)) {
+//                     // bind parameters and execute statement
+//                     $stmt->execute();
+//                     if ($stmt->affected_rows > 0) {
+//                         $OK = true;
+//                     }
+//                 }
+//             }
+//         }
+//         // header('Location: http://localhost:81/phpsols/admin/blog_list_mysqli.php');
+//         // exit;
+//         }
+
+//         if ($OK) {
+//             echo ('reroute dis bad boy');
+//             // header('Location: http://www.google.com');
+//             exit;
+//         } else {
+//             $error = $stmt->error;
+//         }
+//     }
 
 // if form has been submitted, update record
 // if (isset($_POST['update'])) {
@@ -139,13 +207,24 @@ if (isset($_POST['update'])) {
 // }
 // redirect if $_GET['AlbumID'] not defined
 // if ($done || !isset($_GET['AlbumID'])) {
-//     header('Location: http://localhost/phprevamp/admin.php');
+//     header('Location: http://localhost:81/phprevamp/admin.php');
 //     exit;
 // }
 // get error message if query fails
 if (isset($stmt) && !$OK && !$done) {
     $error = $stmt->error;
 }
+$s = 1;
+$songList = [];
+
+// if (isset($_POST['update'])) {
+//     while ($s < 20) {
+//         $songNum = 'song'.$s;
+//         $currentSong = $_POST["$songNum"];
+//         echo '$currentSong';
+//         $s++;
+//     }
+// }
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -161,7 +240,7 @@ if (isset($stmt) && !$OK && !$done) {
 <!-- Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <link href="http://localhost/phprevamp/css/admin.css" rel="stylesheet" type="text/css">
+    <link href="http://localhost:81/phprevamp/css/admin.css" rel="stylesheet" type="text/css">
 
 <!--Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
@@ -175,17 +254,18 @@ if (isset($stmt) && !$OK && !$done) {
 
 <body class="container-fluid">
 <section>
+<?php include '../includes/HTML/adminNav.php'; ?>
 <h1 class="pb-3"><i class="fas fa-users-cog"></i> Albums | Update Album</h1>
-<?php if (isset($error)) {
+<?php if (!empty($error)) {
     echo "<p class='warning'>Error: $error</p>";
 }
-if ($albumID == 0) {?>
+if ($currentAlbumID == 0) {?>
     <p class="warning">Invalid Request: record does not exist.</p>
 <?php } else { ?>
 <form method="post" actionb="" class="" enctype="multipart/form-data" name="update" id="updateForm">
     <p class="col-12 col-md-8 row">
         <label for="name" class="col-12 col-sm-3 ">Album Name:</label>
-        <input name="name" type="text" id="name" value="<?= htmlentities($albumName); ?>" class="col-10 col-sm-9 ml-3 ml-sm-0">
+        <input name="name" type="text" id="name" value="<?= $albumName; ?>" class="col-10 col-sm-9 ml-3 ml-sm-0">
     </p>
 
     <p class="col-12 col-md-8 row">
@@ -283,7 +363,7 @@ if ($albumID == 0) {?>
         <a class="songBtn" id="newSong">+</a>
     </p>
     <p>
-        <input name="albumID" type="hidden" value="<?= htmlentities($albumID); ?>">
+        <input name="albumID" type="hidden" value="<?= htmlentities($currentAlbumID); ?>">
         <input type="submit" name="update" value="Update Entry" id="update" class="btn btn-outline-info">
     </p>
 
@@ -292,3 +372,6 @@ if ($albumID == 0) {?>
 </section>
 </body>
 </html>
+<?php
+ob_end_flush();
+?>

@@ -1,4 +1,16 @@
 <?php
+session_start();
+ob_start();
+$loginPage= 'yep';
+if (isset($_SESSION['name'])) {
+        $name = $_SESSION['name'];
+     }
+if (isset($_SESSION['email'])) {
+        $email = $_SESSION['email'];
+     }
+if (isset($_SESSION['ID'])) {
+        $ID = $_SESSION['ID'];
+     }
 use includes\Authenticate\CheckPassword;
 $error = '';
 $loginPage = 'yep';
@@ -41,7 +53,9 @@ if (isset($_POST['registerBtn'])) {
 	// $checkPwd->requireMixedCase();
 	// $checkPwd->requireNumbers(1);
 	$pwdOk = $checkPwd->check();
-	if (!$pwdOk) {
+	if ($pwdOk) {
+		// $passCheckResult = ['Password OK'];
+	} else {
 		$passCheckResult = $checkPwd->getErrors();
 	}
 
@@ -79,21 +93,18 @@ if ($allOk) {
 	$conn = dbConnect('admin');
 	$stmt = $conn->stmt_init();
     // create SQL
-    $sql = 'INSERT INTO admin (Username, Password, Email) VALUES(?, SHA1(?), ?)';
+    $sql = "UPDATE admin SET Username = ?, Password = SHA(?), Email = ? WHERE AdminID = ?";
     // bind parameters and execute statement
     if ($stmt->prepare($sql)) {
         // bind parameters and execute statement
-        $stmt->bind_param('sss', $username, $pwd, $email);
+        $stmt->bind_param('sssi', $username, $pwd, $email, $ID);
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
             $insertedCheck = 'sent';
         } else {$insertedCheck = 'failed';}
-    }
-	if (!$Sresult) {
-	    $error = $conn->error;
-	}
-	} else {
+    } else {
 	echo "I can't seem to reach the database... Please check back later!";
+	}
 }
 }
 
@@ -142,11 +153,11 @@ $conn = dbConnect('admin');
 	    <?php //require './includes/HTML/adminNav.php'; ?>
 	    <section>
 	    	<?php
-	    	// testAdmin testAdminPass1
+	    	// tester2 tester2A
 	    	if (isset($_POST['registerBtn'])) {
 	    	switch ($insertedCheck) {
 	    		case 'sent':
-	    		header('Location:https://google.com');
+	    		header('Location:http://localhost:81/phprevamp/profile.php');
 	            break;
 
 	    		case 'failed':
@@ -209,7 +220,7 @@ $conn = dbConnect('admin');
 	    <form  method="post" action="" name="register" id="register" class="">
 	    	<p class="formP">
 		    	<label for="username">Username: </label>
-		    	<input type="text" name="username" id="username">
+		    	<input type="text" name="username" id="username" value="<?= $name?>">
 	    	</p>
 			<p class="formP">
 		    	<label for="pwd">Password: </label>
@@ -224,9 +235,10 @@ $conn = dbConnect('admin');
 
 			<p class="formP">
 		    	<label for="email">Email: </label>
-		    	<input type="text" name="email" id="email">
+		    	<input type="text" name="email" id="email" value="<?= $email?>">
 			</p>
-	    	<input type="submit" name="registerBtn" id="registerBtn" value="Create Account" class="d-block btn btn-outline-info my-3">
+	    	<input type="submit" name="registerBtn" id="registerBtn" value="Edit Account" class="btn btn-outline-info my-3">
+	    	<a href="#" class="btn btn-outline-danger my-3">Go Back</a>
 	    </form>
 	    </section>
 	</div>

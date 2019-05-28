@@ -8,23 +8,25 @@ $deleted = false;
 // initialize statement
 $stmt = $conn->stmt_init();
 // get details of selected record
-if (isset($_GET['article_id']) && !$_POST) {
+if (isset($_GET['AlbumID']) && !$_POST) {
     // prepare SQL query
-    $sql = 'SELECT article_id, title, created
-            FROM blog WHERE article_id = ?';
+    $sql = 'SELECT AlbumID, title, dateCreated
+            FROM songs WHERE AlbumID = ?';
     if ($stmt->prepare($sql)) {
         // bind the query parameters
-        $stmt->bind_param('i', $_GET['article_id']);
+        $stmt->bind_param('i', $_GET['AlbumID']);
         // execute the query, and fetch the result
         $OK = $stmt->execute();
         // bind the result to variables
         $stmt->bind_result($article_id, $title, $created);
         $stmt->fetch();
+        $stmt_close;
+
     }
 }
 // if confirm deletion button has been clicked, delete record
 if (isset($_POST['delete'])) {
-    $sql = 'DELETE FROM blog WHERE article_id = ?';
+    $sql = 'DELETE * FROM songs WHERE article_id = ?';
     if ($stmt->prepare($sql)) {
         $stmt->bind_param('i', $_POST['article_id']);
         $stmt->execute();

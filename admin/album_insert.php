@@ -147,8 +147,8 @@ if (isset($_POST['insert'])) {
 <?php
 ?>
 <?php
-include '../includes/title.php';
-include '../includes/adminNav.php';
+include '../includes/HTML/title.php';
+include '../includes/HTML/adminNav.php';
 ?>
 <section>
     <?php

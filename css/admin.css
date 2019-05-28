@@ -10,6 +10,7 @@ Fonts:
 
 body {
     background-color: #d8d9da;
+    min-width: 320px;
 }
 section{
     width: 95%;
@@ -81,6 +82,38 @@ label {
 .registerSmallE {
     padding-left: 1.5rem;
     }
+
+
+.logoutOverlay {
+    min-width: 320px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20% 30% 40%;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,.7);
+}
+.logoutOverlay div {
+    background-color: rgb(255,255,255);
+    /*border: 2px solid rgba(255,255,255,1);*/
+    border-radius: .5rem;
+    padding: 5%;
+}
+.space {
+        margin-bottom: 3.5rem;
+    }
+
+.btn-outline-info {
+    color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+    color: #fff;
+}
+
+
+
 @media screen and (max-width: 700px) {
     .coverWarning {
        margin-top: -.5rem;
@@ -88,6 +121,12 @@ label {
 
     .registerSmall {
         padding-left: 0;
+    }
+    .logoutOverlay {
+    padding: 50% 30% 10%;
+    }
+    .space {
+        margin-bottom: 8rem;
     }
 }
 /*Global------------------------------------*/
