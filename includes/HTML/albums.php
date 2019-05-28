@@ -1,8 +1,13 @@
-<?php require_once 'connection.php';
-
-$conn = dbConnect('view');
+<?php
+$conn = dbConnect('admin');
 define('SHOWMAX', 6);
-$sql = "SELECT AlbumID, AlbumName, ImageName, dateCreated, dateUpdated FROM Albums LIMIT " . SHOWMAX;
+$conn = dbConnect('admin');
+$sql = 'SELECT AlbumName, imgType, AlbumID FROM albums ORDER BY dateCreated ASC';
+$result = $conn->query($sql);
+if (!$result) {
+    $error = $conn->error;
+}
+
 
 ?>
 
@@ -11,13 +16,31 @@ $sql = "SELECT AlbumID, AlbumName, ImageName, dateCreated, dateUpdated FROM Albu
     <h2  class="text-light text-center">Albums</h2>
         <div class="container font">
             <div class="row">
-
-                <div class="col col-lg-6 test">
-                    <h3 class="text-light card-title"></h3>
-                    <img src="images/.jpg" class="card-img-fluid-sm rounded" alt="">
+            <?php
+            $k = 0;
+            while($row = $result->fetch_assoc()) {
+            $albumImgName = str_replace('.', '-', $row['AlbumName']);
+            $albumName = str_replace('.', ' ', $row['AlbumName']);
+            $AlbumID = $row['AlbumID'];
+            ?>
+                <div class="col col-lg-6 newAlbum">
+                    <h3 class="text-light card-title"><?= $albumName ?></h3>
+                    <img src="<?= 'images/'.$albumImgName.'.'.$row['imgType']; ?>" class="card-img-fluid-sm rounded" alt="">
                         <ol class="text-light">
+                            <?php
+                            $songSql = "SELECT Name FROM songs WHERE AlbumID = $AlbumID";
+                            $query = $conn->query($songSql);
+                            if (!$query) {
+                                $error = $conn->error;
+                            }
+                            while($song = $query->fetch_assoc()) {
+                                $songName = "$song[$k]";
+                                ?>
+                                <li><?= $songName; ?></li>
+                            <?php $k++; } ?>
                         </ol>
                 </div> <!-- col -->
+            <?php } ?>
 
                 <div class="col col-lg-6 origins">
                     <h3 class="text-light card-title">Origins (Deluxe)</h3>
