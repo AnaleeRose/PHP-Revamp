@@ -283,8 +283,9 @@ if (isset($success)) {
         <a class="songBtn" id="newSong">+</a>
     </p>
 
-    <p class="col-5 col-md-3">
-        <input type="submit" name="insertBtn" value="Insert New Album" id="insert" class="btn btn-outline-info">
+    <p class="">
+        <input type="submit" name="insertBtn" value="Insert New Album" id="insert" class="btn btn-outline-info d-inline-block">
+        <a href="http://localhost:81/phprevamp/admin/album_list.php" id="cancel_delete" class="btn btn-outline-danger d-inline-block">Cancel</a>
     </p>
 </form>
 <?php } }

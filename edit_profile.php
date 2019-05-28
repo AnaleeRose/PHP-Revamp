@@ -238,7 +238,7 @@ $conn = dbConnect('admin');
 		    	<input type="text" name="email" id="email" value="<?= $email?>">
 			</p>
 	    	<input type="submit" name="registerBtn" id="registerBtn" value="Edit Account" class="btn btn-outline-info my-3">
-	    	<a href="#" class="btn btn-outline-danger my-3">Go Back</a>
+	    	<a href="profile.php" class="btn btn-outline-danger my-3">Go Back</a>
 	    </form>
 	    </section>
 	</div>

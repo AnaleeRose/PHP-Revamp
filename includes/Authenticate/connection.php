@@ -10,7 +10,7 @@ function dbconnect ($usertype, $connectionType = 'mysqli') {
         $pwd = '3.14NCream';
     } elseif ($usertype == 'view') {
         $user = 'view';
-        $pwd = '';
+        $pwd = 'view';
     } else {
         exit('Unrecongnized user');
     }

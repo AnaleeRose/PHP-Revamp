@@ -9,10 +9,10 @@ $OK = false;
 $done = false;
 $currentAlbumID = $_GET['AlbumID'];
 $albumName = 'Unknown';
-// checking to see you didn't delete everything
+$updated = false;
 $nextStep = false;
 $success = false;
-$errors = [];
+// checking to see you didn't delete everything
 $errors = [];
 $missing = [];
 $required = ['name', 'song1'];
@@ -60,14 +60,14 @@ if (isset($_GET['AlbumID'])) {
         // output data of each row
         while($row = $result->fetch_assoc()) {
             $albumID = $row['AlbumID'];
-            echo $albumID;
+            // echo $albumID;
             $albumName = $row['AlbumName'];
             $albumName = str_replace('.', ' ', $albumName);
-            echo $albumName;
+            // echo $albumName;
             $prevExtension = $row['ImgType'];
             $songName = $row['Name'];
             $songName = str_replace('.', ' ', $songName);
-            echo $songName;
+            // echo $songName;
 
             $song[$i] = $songName;
             $kCount = (count($song) - 1);
@@ -111,7 +111,6 @@ if (isset($_POST['update'])) {
     $newAlbumName = $_POST['name'];
     $newAlbumName = str_replace(' ', '.', $_POST['name']);
     $newAlbumName = preg_replace('/[^a-zA-Z0-9-(-)-.-]/', '', $newAlbumName);
-    echo $newAlbumName;
     $extension = pathinfo($_FILES["cover"]["name"], PATHINFO_EXTENSION);
     if (empty($extension)) {
         $extension = $prevExtension;
@@ -131,29 +130,38 @@ if (isset($_POST['update'])) {
     $OK = false;
     // create SQL
     $conn = dbConnect('admin');
-    $newAlbumName = "'".$newAlbumName."'";
-    $extension = "'".$extension."'";
-    $sql = "UPDATE Albums SET AlbumName = $newAlbumName, ImgType = $extension WHERE AlbumID = $currentAlbumID";
+    $sql = "UPDATE Albums SET AlbumName = '$newAlbumName', ImgType = '$extension' WHERE AlbumID = $currentAlbumID";
     $updateAlbum = $conn->query($sql);
-    $sqlD = "DELETE FROM songs WHERE AlbumID = $AlbumID";
-    $deleteSongs = $conn->query($sqlD);
-    while ($i <= 20) {
-        $song = 'song' . $i;
-        if (!empty($_POST["$song"])) {
-            $songName = preg_replace('/[^a-zA-Z0-9\- ]/', '', $_POST["$song"]);
-            $songName = str_replace(' ', ".", $songName);
-            if ($songName) {array_push($songlist, $songName);}
-            if (!in_array($songName, $songlist)) {
-                $error[] = "Could not upload $songName.";
+    if ($updateAlbum) {
+        $sqlD = "DELETE FROM songs WHERE AlbumID = $albumID";
+        $deleteSongs = $conn->query($sqlD);
+        if ($deleteSongs) {
+            $songlist= [];
+            $m = 0;
+            while ($m <= 20) {
+                $songc = 'song' . $m;
+                if (!empty($_POST["$songc"])) {
+                    $songNameC = $_POST["$songc"];
+                    $songNameC = preg_replace('/[^a-zA-Z0-9\- ]/', '', $songNameC);
+                    $songNameC = str_replace(' ', ".", $songNameC);
+                    if ($songNameC) {$songlist[] = $songNameC;}
+                    if (!in_array($songNameC, $songlist)) {
+                        $error[] = "Could not upload $songNameC.";
+                    }
+                }
+                $m++;
+                }
+                // sends the songs to the db
+                foreach ($songlist as $key => $value) {
+                $sqlI = "INSERT INTO songs (AlbumID, Name) VALUES ($currentAlbumID, '$value')";
+                $newSong = $conn->query($sqlI);
             }
+            $updated = true;
         }
-        $i++;
     }
-            // sends the songs to the db
-        foreach ($songlist as $key => $value) {
-            $sqlI = "INSERT INTO Songs (AlbumID, Name) VALUES ('$currentAlbumID', '$value')";
-            $newSong = $conn->query($sqlI);
-        }
+
+    //
+
     }
     // else {
     //     $errors[] = "The database cannot currently be reached...";
@@ -275,13 +283,13 @@ $s = 1;
 
 <body class="container">
 <section>
-<?php // include '../includes/HTML/adminNav.php';
-echo $song[0];
+<?php include '../includes/HTML/adminNav.php';
 ?>
 <h1 class="pb-3"><i class="fas fa-users-cog"></i> Albums | Update Album</h1>
 <?php if (!empty($error)) {
     echo "<p class='warning'>Error: $error</p>";
 }
+if (!$updated) {
 if ($currentAlbumID == 0) {?>
     <p class="warning">Invalid Request: record does not exist.</p>
 <?php } else { ?>
@@ -300,7 +308,7 @@ if ($currentAlbumID == 0) {?>
     <div id="songs" class="col-12">
         <p class="col-10 row">
             <label for="song1 hide" class="col-3 col-md-2 col-xl-1">Title <?= $s++ ?>:</label>
-            <input name="song1" type="text" id="song1"  class="col-9 col-md-10 col-xl-11" value="<?php if ($k <= $kCount) {echo htmlentities($song[$k]); $k++;}?>">
+            <input name="song1" type="text" id="song1"  class="col-9 col-md-10 col-xl-11" value="<?php if ($k <= $kCount) {echo  htmlentities($song[$k]); $k++;}?>">
         </p>
         <p class="col-10 row">
             <label for="song2" class="col-3 col-md-2 col-xl-1">Title <?= $s++ ?>:</label>
@@ -388,10 +396,11 @@ if ($currentAlbumID == 0) {?>
     <p>
         <input name="albumID" type="hidden" value="<?= htmlentities($currentAlbumID); ?>">
         <input type="submit" name="update" value="Update Entry" id="update" class="btn btn-outline-info">
+        <a href="http://localhost:81/phprevamp/admin/album_list.php" id="cancel_delete" class="btn btn-outline-danger">Cancel</a>
     </p>
 
 </form>
-<?php } ?>
+<?php } }else {header('Location:album_list.php');} ?>
 </section>
 </body>
 </html>

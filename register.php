@@ -38,8 +38,8 @@ if (isset($_POST['registerBtn'])) {
 		$email = trim($_POST['email']);
 
 		$checkPwd = new CheckPassword($pwd, 3);
-		// $checkPwd->requireMixedCase();
-		// $checkPwd->requireNumbers(1);
+		$checkPwd->requireMixedCase();
+		$checkPwd->requireNumbers(1);
 		$pwdOk = $checkPwd->check();
 		if (!$pwdOk) {
 			$passCheckResult = $checkPwd->getErrors();
@@ -143,7 +143,7 @@ $conn = dbConnect('admin');
 	    	if (isset($_POST['registerBtn'])) {
 	    	switch ($insertedCheck) {
 	    		case 'sent':
-	    		header('Location:https://google.com');
+	    		header('Location:login.php');
 	            break;
 
 	    		case 'failed':

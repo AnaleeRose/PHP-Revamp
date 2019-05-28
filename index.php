@@ -1,4 +1,4 @@
-<?php require_once './includes/connection.php'; ?>
+<?php require 'includes/Authenticate/connection.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +25,7 @@
 </head>
 <body>
 
-    <?php require './includes/nav.php'; ?>
+    <?php require './includes/HTML/nav.php'; ?>
 
 	<header id="page-top">
 			<h1 class="title text-dark text-center">Imagine Dragons</h1>
@@ -59,17 +59,17 @@
 			</div> <!-- card -->
 		</section> <!-- about -->
 
-    <?php require './includes/members.php'; ?>
-
-
-    <?php require './includes/albums.php'; ?>
+    <?php
+    require './includes/HTML/members.php';
+    require './includes/HTML/albums.php';
+    ?>
 
 	</main>
 
 
 	<footer>
-	 <?php require './includes/contact.php'; ?>
-     <?php require './includes/footer.php'; ?>
+	 <?php require './includes/HTML/contact.php'; ?>
+     <?php require './includes/HTML/footer.php'; ?>
 	</footer>
 
 </body>
