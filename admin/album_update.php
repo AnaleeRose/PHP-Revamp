@@ -10,6 +10,9 @@ $done = false;
 $currentAlbumID = $_GET['AlbumID'];
 $albumName = 'Unknown';
 // checking to see you didn't delete everything
+$nextStep = false;
+$success = false;
+$errors = [];
 $errors = [];
 $missing = [];
 $required = ['name', 'song1'];
@@ -57,14 +60,14 @@ if (isset($_GET['AlbumID'])) {
         // output data of each row
         while($row = $result->fetch_assoc()) {
             $albumID = $row['AlbumID'];
-            // echo $albumID;
+            echo $albumID;
             $albumName = $row['AlbumName'];
             $albumName = str_replace('.', ' ', $albumName);
-            // echo $albumName;
+            echo $albumName;
             $prevExtension = $row['ImgType'];
             $songName = $row['Name'];
             $songName = str_replace('.', ' ', $songName);
-            // echo $songName;
+            echo $songName;
 
             $song[$i] = $songName;
             $kCount = (count($song) - 1);
@@ -73,7 +76,7 @@ if (isset($_GET['AlbumID'])) {
     } else {
         echo "0 results";
     }
-    $conn->close();
+    // $conn->close();
     // $stmt = $conn->stmt_init();
     //
     // if ($stmt->prepare($query)) {
@@ -131,9 +134,31 @@ if (isset($_POST['update'])) {
     $newAlbumName = "'".$newAlbumName."'";
     $extension = "'".$extension."'";
     $sql = "UPDATE Albums SET AlbumName = $newAlbumName, ImgType = $extension WHERE AlbumID = $currentAlbumID";
-    if (!mysqli_query($conn, $sql)) {
-        echo "Error...";
+    $updateAlbum = $conn->query($sql);
+    $sqlD = "DELETE FROM songs WHERE AlbumID = $AlbumID";
+    $deleteSongs = $conn->query($sqlD);
+    while ($i <= 20) {
+        $song = 'song' . $i;
+        if (!empty($_POST["$song"])) {
+            $songName = preg_replace('/[^a-zA-Z0-9\- ]/', '', $_POST["$song"]);
+            $songName = str_replace(' ', ".", $songName);
+            if ($songName) {array_push($songlist, $songName);}
+            if (!in_array($songName, $songlist)) {
+                $error[] = "Could not upload $songName.";
+            }
+        }
+        $i++;
     }
+            // sends the songs to the db
+        foreach ($songlist as $key => $value) {
+            $sqlI = "INSERT INTO Songs (AlbumID, Name) VALUES ('$currentAlbumID', '$value')";
+            $newSong = $conn->query($sqlI);
+        }
+    }
+    // else {
+    //     $errors[] = "The database cannot currently be reached...";
+    // }
+
 //     $sql3 = 'SELECT AlbumID FROM Albums WHERE AlbumID = ? ORDER By dateCreated DESC LIMIT 1';
 //     // bind parameters and execute statement
     // $stmt = $conn->stmt_init();
@@ -155,7 +180,7 @@ if (isset($_POST['update'])) {
         //         }
         //     }
         // }
-    }
+
 //         // header('Location: http://localhost:81/phpsols/admin/blog_list_mysqli.php');
 //         // exit;
 //         }
@@ -211,11 +236,7 @@ if (isset($_POST['update'])) {
 //     exit;
 // }
 // get error message if query fails
-if (isset($stmt) && !$OK && !$done) {
-    $error = $stmt->error;
-}
 $s = 1;
-$songList = [];
 
 // if (isset($_POST['update'])) {
 //     while ($s < 20) {
@@ -252,9 +273,11 @@ $songList = [];
     <script src="../js/limitSongList.js" defer></script>
 </head>
 
-<body class="container-fluid">
+<body class="container">
 <section>
-<?php include '../includes/HTML/adminNav.php'; ?>
+<?php // include '../includes/HTML/adminNav.php';
+echo $song[0];
+?>
 <h1 class="pb-3"><i class="fas fa-users-cog"></i> Albums | Update Album</h1>
 <?php if (!empty($error)) {
     echo "<p class='warning'>Error: $error</p>";
