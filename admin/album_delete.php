@@ -1,52 +1,56 @@
 <?php
-include '../includes/title.php';
-require_once '../includes/connection.php';
+include '../includes/HTML/title.php';
+require_once '../includes/Authenticate/connection.php';
 $conn = dbConnect('admin');
 // initialize flags
 $OK = false;
 $deleted = false;
+$error = [];
 // initialize statement
 $stmt = $conn->stmt_init();
 // get details of selected record
-if (isset($_GET['AlbumID']) && !$_POST) {
+if (isset($_GET['AlbumID'])) {
+    $AlbumID = $_GET['AlbumID'];
     // prepare SQL query
-    $sql = 'SELECT AlbumID, title, dateCreated
-            FROM songs WHERE AlbumID = ?';
-    if ($stmt->prepare($sql)) {
-        // bind the query parameters
-        $stmt->bind_param('i', $_GET['AlbumID']);
-        // execute the query, and fetch the result
-        $OK = $stmt->execute();
-        // bind the result to variables
-        $stmt->bind_result($article_id, $title, $created);
-        $stmt->fetch();
-        $stmt_close;
-
+    $sql = "SELECT AlbumID, AlbumName, dateCreated FROM albums WHERE AlbumID = $AlbumID";
+    $selectCurrentAlbum = $conn->query($sql);
+    if ($selectCurrentAlbum) {
+        while ($row = $selectCurrentAlbum->fetch_array()) {
+            $dbAlbumID = $row['AlbumID'];
+            $albumName = str_replace('.', ' ', $row['AlbumName']);
+            $dateCreated = $row['dateCreated'];
+        }
+    } else {
+        $error[] = "That record does not exist.";
     }
 }
+
+
 // if confirm deletion button has been clicked, delete record
 if (isset($_POST['delete'])) {
-    $sql = 'DELETE * FROM songs WHERE article_id = ?';
-    if ($stmt->prepare($sql)) {
-        $stmt->bind_param('i', $_POST['article_id']);
-        $stmt->execute();
-        // if there's an error affected_rows is -1
-        if ($stmt->affected_rows > 0) {
+    $sql = "DELETE FROM songs WHERE AlbumID = $AlbumID";
+    $deleteSongs = $conn->query($sql);
+    if ($deleteSongs) {
+        $sqlDelete = "DELETE FROM albums WHERE AlbumID = $AlbumID";
+        $deleteAlbum = $conn->query($sqlDelete);
+        if ($deleteAlbum) {
             $deleted = true;
-        } else {
-            $error = 'There was a problem deleting the record. ';
+            $sqlCheck = "SELECT * FROM albums WHERE AlbumID = $AlbumID";
+            $runSqlCheck = $conn->query($sqlCheck);
+            if ($runSqlCheck) {
+                echo "waddup";
+            }
         }
+    } else {
+        $error[] = "The database cannot currently be reached...";
     }
 }
 // redirect the page if deletion is successful,
-// cancel button clicked, or $_GET['article_id'] not defined
-if ($deleted || isset($_POST['cancel_delete']) || !isset($_GET['article_id']))  {
-    header('Location: http://localhost/phpnovice/phpsols/admin/blog_list_mysqli.php');
+// cancel button clicked, or $_GET['AlbumID'] not defined
+// if ($deleted || isset($_POST['cancel_delete']) ||
+if (!isset($_GET['AlbumID']))  {
+    header('Location: http://localhost:81/phprevamp/login.php');
     exit;
-}
-// if any SQL query fails, get the error message
-if (isset($stmt) && !$OK && !$deleted) {
-    $error .= $stmt->error;
 }
 ?>
 <!DOCTYPE HTML>
@@ -63,7 +67,7 @@ if (isset($stmt) && !$OK && !$deleted) {
 <!-- Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <link href="../styles/admin.css" rel="stylesheet" type="text/css">
+    <link href="../css/admin.css" rel="stylesheet" type="text/css">
 
 <!--Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet">
@@ -76,27 +80,52 @@ if (isset($stmt) && !$OK && !$deleted) {
 </head>
 
 <body class="container-fluid">
-<h1>Delete Blog Entry </h1>
+<?php
+require './../includes/HTML/adminNav.php';
+if (!empty($error)) {
+print_r($error);
+}
+?>
+<section>
+<h1 class="pb-3"><i class="fas fa-users-cog"></i> Albums | Delete Entry</h1>
+<?php if ($deleted) {
+    header('Location:http://localhost:81/phprevamp/admin/album_list.php');;
+} else {
+
+?>
 <?php
 if (isset($error)  && !empty($error)) {
     echo "<p class='warning'>Error: $error</p>";
 }
-if($article_id == 0) { ?>
-    <p class="warning">Invalid request: record does not exist.</p>
+if($AlbumID == 0) { ?>
+    <p class="warning">Hm... that album doesn't seem to exist.</p>
 <?php } else { ?>
-    <p class="warning">Please confirm that you want to delete the following item. This action cannot be undone.</p>
-    <p><?= $created . ': ' . htmlentities($title); ?></p>
-<?php } ?>
+    <p><?php if (isset($albumName)){ ?>
+    <p class="warning fullSize">Please confirm that you want to delete this album.</p>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Date created</th>
+        </tr>
+        <tr>
+    <?php
+        echo '<td>'.htmlentities($albumName).'</td>';
+        echo '<td>'. $dateCreated.'</td>';
+    ?>
+        </tr>
+    </table>
 <form method="post" action="">
     <p>
-        <?php if(isset($article_id) && $article_id > 0) { ?>
-            <input type="submit" name="delete" value="Confirm Deletion">
+        <?php if(isset($AlbumID) && $AlbumID > 0) { ?>
+            <input type="submit" name="delete" value="Confirm Deletion" class="btn btn-outline-danger mt-2 mr-2">
         <?php } ?>
-        <input name="cancel_delete" type="submit" id="cancel_delete" value="Cancel">
-        <?php if(isset($article_id) && $article_id > 0) { ?>
-            <input name="article_id" type="hidden" value="<?= $article_id; ?>">
-        <?php } ?>
+        <a href="http://localhost:81/phprevamp/admin/album_list.php" id="cancel_delete" class="btn btn-outline-info mt-2">Cancel</a>
     </p>
 </form>
+<?php
+        } // <p><?php if (isset($albumName)){
+    }
+} ?>
+</section>
 </body>
 </html>

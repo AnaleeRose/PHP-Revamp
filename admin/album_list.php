@@ -1,6 +1,9 @@
 <?php
 session_start();
 ob_start();
+if (!$_SESSION['name']){
+    header('Location: http://localhost:81/phprevamp/login.php');
+}
 include '../includes/HTML/title.php';
 require_once '../includes/Authenticate/connection.php';
 // create database connection
@@ -66,7 +69,7 @@ if (!$result) {
     <?php } ?>
 </table>
 <?php } ?>
-<p><a href="http://localhost:81/phprevamp/admin/album_insert.php" class="btn btn-outline-info">Insert new entry</a></p>
+<p><a href="http://localhost:81/phprevamp/admin/album_insert.php" class="btn btn-outline-info">Insert New Album</a></p>
 <script src="../js/limitSongList.js"></script>
 </section>
 </body>

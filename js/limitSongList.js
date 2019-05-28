@@ -95,25 +95,51 @@
         limit();
 //error effect
     if (page == "insert"){
-        var errorsExist = document.querySelector(".errorEffect");
-        var errorDiv = document.querySelector("#errors");
-        var cover = document.getElementById("cover");
-        if (cover) {
-          if(cover.value == '') {
-            var error = document.createElement("p");
-            var errorList = document.getElementById("errorList");
-            var eText = document.createTextNode("If you do not add a cover, a default will be used.");
-            var trackHeader = document.querySelector(".tracks");
-            var form = document.querySelector("#insertForm")
-            error.classList.add("warning", "pl-3", "coverWarning");
-            error.appendChild(eText);
-            form.insertBefore(error, trackHeader);
-        }
-        }
+        var errorsExist = document.body.querySelector(".errorEffect");
+        var errorDiv = document.body.querySelector("#errors");
+        var cover = document.body.querySelector("#cover");
+        var n = document.body.querySelector("#name");
+        var t = document.body.querySelector("#song1");
+        var body = document.body;
+        body.addEventListener("keydown", hideRequired);
         if (errorsExist) {
             errorDiv.classList.add("errorEffectDiv");
         }
+        function hideRequired() {
+          if (n.value) {
+            let small = document.body.querySelector(".nameSmall");
+            small.classList.add("hidden");
+          } else {
+            if (!n.value) {
+              let small = document.body.querySelector(".nameSmall");
+              small.classList.remove("hidden");
+            }
+          }
+
+          if (cover.value) {
+            let small = document.body.querySelector(".coverSmall");
+            small.classList.add("hidden");
+          } else {
+            if (!n.value) {
+              let small = document.body.querySelector("coverSmall");
+              small.classList.remove("hidden");
+            }
+          }
+
+          if (t.value) {
+            let small = document.body.querySelector(".tSmall");
+            small.classList.add("hidden");
+          } else {
+            if (!n.value) {
+              let small = document.body.querySelector(".tSmall");
+              small.classList.remove("hidden");
+              }
+            }
+          }
+
     }
+    //if (n.value) {console.log("henlo")} else {console.log("test")}
+
         // cool function that added new song inputs... doesnt work with php ;-;
         // function addSong() {
         //     if (songLimit == false) {

@@ -1,7 +1,8 @@
 <?php
 session_start();
     ob_start();
-    $loginPage= 'yep';
+    $loginPage = 'yep';
+    $profile = 'yep';
 if (isset($_SESSION['name'])) {
         $name = $_SESSION['name'];
      }

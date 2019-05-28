@@ -17,6 +17,7 @@ class Upload {
     protected $newName;
     protected $albumName;
     protected $renameDuplicates;
+    public $yep = false;
 
 
     public function __construct($path, $an) {
@@ -214,16 +215,23 @@ class Upload {
         $filename = isset($this->albumName) ? $this->albumName : $_POST['name'];
         $success = move_uploaded_file($file['tmp_name'], $this->destination . $filename);
         if ($success) {
-            $result = $file['name'] . ' was uploaded successfully';
+            $result = '<span id="success">'.$file['name'] . ' was uploaded successfully'.'</span>';
             if (!is_null($this->albumName)) {
                 $result .= ', and was renamed ' . $this->albumName;
             }
             $this->messages[] = $result;
+            $this->yep = true;
         } else {
             $this->messages[] = 'Could not upload ' . $file['name'];
         }
     }
 
+    public function checkYep($yep)
+    {
+        if ($this->yep = true) {
+            return $yep;
+        }
+    }
 
 
 }

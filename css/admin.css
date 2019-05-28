@@ -24,8 +24,9 @@ input {color: #197a8a;}
     cursor: pointer;
     color: #17a2b8;
     font-size: 2rem;
-    padding: 0 .9rem .4rem;
+    padding: 0 .95rem .4rem;
     border: 1px solid #fff;
+    /*border: 1px solid #17a2b8;*/
     border-radius: .25rem;
 }
 
@@ -52,6 +53,18 @@ input {color: #197a8a;}
     border-radius: .25rem;
     background: rgba(255, 201, 201, 0.5);
 }
+
+.successEffectDiv {
+    border: 1px solid green;
+    color: darkgreen;
+    padding: 1rem;
+    margin: 0 0 1rem;
+    border-radius: .25rem;
+    background: rgba(201, 255, 201, 0.5);
+}
+    #successEffectUl li {
+        color: #28a745;
+    }
 
 .hidden {
     width: 0;
@@ -112,6 +125,16 @@ label {
     color: #fff;
 }
 
+span.success {
+    color: #17a2b8;
+}
+
+.smallFont {
+    font-size: 90%;
+}
+.fullSize {
+    font-size: 100%;
+}
 
 
 @media screen and (max-width: 700px) {
